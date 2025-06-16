@@ -16,6 +16,7 @@ class Review:
         self.rating = rating
         self.place = place
         self.user = user
+        self.deleted = False
 
     # ---getter and setter---
     @property
@@ -75,3 +76,43 @@ class Review:
     def save(self):
         """Update the updated_at timestamp whenever the object is modified"""
         self.updated_at = datetime.now()
+
+    def can_edit_by(self, user):
+        """Check if the current user is admin, only the author the review or admin can edit it"""
+        return self.user.id == user.id or getattr(user, "is_admin", False)
+
+    def can_delete_by(self, user):
+        """Check if the current user is admin, only the author the review or admin can delete it"""
+        return self.user.id == user.id or getattr(user, "is_admin", False)
+
+    def edit(self, user, new_text=None,  new_rating=None):
+        if not self.can_edit_by(user):
+            raise PermissionError(
+                "You do not have permission to edit this review.")
+        if new_text is not None:
+            self.text = new_text
+        if new_rating is not None:
+            self.rating = new_rating
+        self.save()
+
+    def delete(self, user):
+        if not self.can_delete_by(user):
+            raise PermissionError(
+                "You do not have permission to delete this review.")
+        self.deleted = True
+        self.save()
+
+
+"""
+1, Syntax: getattr(object, attribute_name, default_value)
+   - obj: the obj whose attribute you want to get
+   - attribute_name: the name of the attribute
+   - default_value: the value to return if the attribute does not exist
+
+2, The default value is set to False because:
+   - if the user object does not have an is_admin attribute, it is safer and more logical
+     to assume the user is not an admin.
+   - this avoids giving admin rights to the wrong users by mistake.
+   - Returning False by default ensures robust and secure permission control.
+
+"""

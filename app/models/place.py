@@ -42,7 +42,6 @@ class Place:
     @description.setter
     def description(self, value):
         self._description = value.strip()
-        self._description = value
 
     @property
     def price(self):
@@ -50,7 +49,7 @@ class Place:
 
     @price.setter
     def price(self, value):
-        if isinstance(value, float) and value > 0.0:
+        if isinstance(value, (int, float)) and value > 0.0:
             self._price = value
         else:
             raise ValueError("Invalid value specified for price")
@@ -61,7 +60,7 @@ class Place:
 
     @latitude.setter
     def latitude(self, value):
-        if isinstance(value, float) and -90.0 <= value <= 90.0:
+        if isinstance(value, (int, float)) and -90.0 <= value <= 90.0:
             self._latitude = value
         else:
             raise ValueError("Invalid value specified for Latitude")
@@ -72,7 +71,7 @@ class Place:
 
     @longitude.setter
     def longitude(self, value):
-        if isinstance(value, float) and -180.0 <= value <= 180.0:
+        if isinstance(value, (int, float)) and -180.0 <= value <= 180.0:
             self._longitude = value
         else:
             raise ValueError("Invalid value specified for Longitude")
@@ -115,12 +114,26 @@ class Place:
             if key in allowed_fields:
                 setattr(self, key, value)
         self.save()  # Update the updated_at timestamp
+        return self
 
-    def add_amenity(self, amenity):
+    def add_amenity(self, amenity, user):
         """Add an amenity to the place."""
         if not isinstance(amenity, Amenity):
             raise ValueError("Input must be a Amenity object.")
+        if user != self.owner:
+            raise PermissionError("Only the owner can add amenities.")
+        # if amenity obj is already present in the self.amenities list, avoid duplicating
+        if amenity in self.amenities:
+            return
         self.amenities.append(amenity)
+
+    def remove_amenity(self, amenity, user):
+        if not isinstance(amenity, Amenity):
+            raise ValueError("Input must be a Amenity object.")
+        if user != self.owner:
+            raise PermissionError("Only the owner can remove amenities.")
+        if amenity in self.amenities:
+            self.amenities.remove(amenity)
 
     @staticmethod
     def place_exists(place_id):
