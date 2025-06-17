@@ -174,5 +174,9 @@ class User:
 
 5, Syntax: .strip().lower(): remove leading and trailing spaces and convert email to lowercase 
  
+6, User login and registeration with email(which is unique, but can be changed);
+   Inside your database and system, use uuid as unique and unchangale ID to find users, places;
+   To check someone is owner, compare the user's uuid with place's uuid
+   To check if a user is an admin, look at thier is_admin field 
 
 """
