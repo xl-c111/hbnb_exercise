@@ -1,15 +1,14 @@
 import uuid
 from datetime import datetime
 import re
-import hashlib
 
 
 class User:
     # a list of User objects
     users_db = []
 
-    def __init__(self, first_name, last_name, email, is_admin, password):
-        if first_name is None or last_name is None or email is None or is_admin is None or password is None:
+    def __init__(self, first_name, last_name, email, is_admin):
+        if first_name is None or last_name is None or email is None or is_admin is None:
             raise ValueError("Required attributes not specified!")
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now()
@@ -18,12 +17,11 @@ class User:
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
-        self.password = password
         self.reviews = []
         self.places = []
-        self.amenities = []
 
     # ---getter and setter---
+
     @property
     def first_name(self):
         return self._first_name
@@ -81,18 +79,6 @@ class User:
             raise ValueError(
                 "is_admin must be a boolean value (True or False).")
         self._is_admin = value
-
-    # for security reason, others should not be allowed to access the password
-    @property
-    def password(self):
-        raise AttributeError("Password is write-only for security reasons.")
-    # only setter method should be kept
-
-    @password.setter
-    def password(self, value):
-        if not value or len(value) < 8:
-            raise ValueError("Password must be at least 8 characters.")
-        self._password = hashlib.sha256(value.encode()).hexdigest()
 
     # ---methods---
 
