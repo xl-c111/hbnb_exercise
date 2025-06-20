@@ -41,6 +41,8 @@ class UserList(Resource):
     def get(self):
         # call facade method get_all_users() method to retrieve a list of users' obj
         users = facade.get_all_users()
+        if not users:
+            return [], 200
         # initialize an empty list to store all users' info in dict format
         user_list = []
         # loop through all user objs just retrieved

@@ -16,6 +16,8 @@ class Review:
         self.rating = rating
         self.place = place
         self.user = user
+        self.user_id = user.id
+        self.place_id = place.id
 
     # ---getter and setter---
     @property
