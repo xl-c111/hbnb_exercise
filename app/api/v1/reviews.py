@@ -23,13 +23,15 @@ class ReviewList(Resource):
     def post(self):
         """Register a new review"""
         review_data = api.payload
-
+        # fetch existing reviews for a place
         reviews = facade.get_reviews_by_place(review_data['place_id'])
         if reviews is None:
             reviews = []
         for review in reviews:
+            # if user already submitted a review
             if review.user.id == review_data['user_id']:
                 return {'error': 'You have already reviewed this place.'}, 400
+        # return a new review obj
         new_review = facade.create_review(review_data)
         return {'id': new_review.id, 'text': new_review.text, 'rating': new_review.rating, 'user_id': new_review.user.id, 'place_id': new_review.place.id}, 201
 
@@ -123,3 +125,19 @@ class PlaceReviewList(Resource):
             })
 
         return review_list, 200
+
+
+"""
+1, review_data = api.payload 
+   - .payload: get the request body and parse it as a python dict
+   - review_data: come from user's new request, holds all the data of review operations(user_id, place_id, texing, rating...)
+
+1, if review.user.id == review_data['user_id']:
+   review.user.id: gets the id of user who wrote this review
+   - review represents single review obj in the loop
+   - review.user represents user attribute of review obj
+   - review.user.id represents id attribute of user obj attached to the review
+
+   review_data['user_id']: extracts the value associated with the key 'user_id' in the review_data dict
+
+"""
